@@ -32,35 +32,35 @@ self.addEventListener("activate", (event) => {
     })
   );
 });
-self.addEventListener("fetch", function (evt) {
-  if (evt.request.url.includes("/api/")) {
-    evt.respondWith(
+self.addEventListener("fetch", function (event) {
+  if (event.request.url.includes("/api/")) {
+    event.respondWith(
       caches
         .open(RUNTIME_CACHE)
         .then((cache) => {
-          return fetch(evt.request)
+          return fetch(event.request)
             .then((response) => {
               // If the response was good, clone it and store it in the cache.
               if (response.status === 200) {
-                cache.put(evt.request.url, response.clone());
+                cache.put(event.request.url, response.clone());
               }
               return response;
             })
             .catch((err) => {
               // Network request failed, try to get it from the cache.
-              return cache.match(evt.request);
+              return cache.match(event.request);
             });
         })
         .catch((err) => console.log(err))
     );
     return;
   }
-  evt.respondWith(
-    fetch(evt.request).catch(function () {
-      return caches.match(evt.request).then(function (response) {
+  event.respondWith(
+    fetch(event.request).catch(function () {
+      return caches.match(event.request).then(function (response) {
         if (response) {
           return response;
-        } else if (evt.request.headers.get("accept").includes("text/html")) {
+        } else if (event.request.headers.get("accept").includes("text/html")) {
           return caches.match("/");
         }
       });
