@@ -8,16 +8,21 @@ const FILES_TO_CACHE = [
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
 ];
-// static
+
+// static cache
 const STATIC_CACHE = "static-cache-v1";
-// runtime
+// runtime cache
 const RUNTIME_CACHE = "data-cache-v1";
+
+//opens cache
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
   self.skipWaiting();
 });
+
+//cleans up old cache
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keyList) => {
@@ -32,6 +37,7 @@ self.addEventListener("activate", (event) => {
     })
   );
 });
+
 self.addEventListener("fetch", function (event) {
   if (event.request.url.includes("/api/")) {
     event.respondWith(
